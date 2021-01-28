@@ -12,7 +12,7 @@ E_g_min = 100.0 #keV
 E_g_max = 10000.0 #keV
 
 #Efficiency at 1.33 MeV, if use native efficiency scaling in MAMA
-eps_LaBr = 1.0#0.2714
+eps_LaBr = 0.2714
 eps_LaBr_unc = 0.0004
 
 #To check that statistical uncertainties behaves correctly with less data
@@ -24,12 +24,21 @@ F_unc = np.sqrt(F) #Uncertainty in nr of fissions
 
 #Only filling matrix in MAMA, unfolding in OMpy
 M, C, y, x = read_mama_2D("28jan2021/252Cf_energy_labr_fission_all_unf_28jan2021.m")
+M_delayed1, C_delayed1, y_delayed1, x_delayed1 = read_mama_2D("28jan2021/252Cf_energy_labr_fission_all_delayed1_unf_28jan2021.m")
+M_delayed2, C_delayed2, y_delayed2, x_delayed2 = read_mama_2D("28jan2021/252Cf_energy_labr_fission_all_delayed2_unf_28jan2021.m")
+M_delayed3, C_delayed3, y_delayed3, x_delayed3 = read_mama_2D("28jan2021/252Cf_energy_labr_fission_all_delayed3_unf_28jan2021.m")
+M_delayed4, C_delayed4, y_delayed4, x_delayed4 = read_mama_2D("28jan2021/252Cf_energy_labr_fission_all_delayed4_unf_28jan2021.m")
+
+
 M_unc, C_unc, y_unc, x_unc = read_mama_2D("28jan2021/252Cf_energy_labr_fission_mama_fnrn_ompy_unf_std_11jun2020.m")
 
 #Modifying because OMpy gives it two excitaton energy bins
 M = M[0]
 M_unc = M_unc[0]
 
+##########################################
+###  Plot data before any corrections  ###
+##########################################
 
 
 ##########################################
@@ -135,12 +144,11 @@ E_g_varbin_unc = np.sqrt( (E_tot_varbin_unc/M_g_varbin)**2 + (E_tot_varbin*M_g_v
 ###############################
 
 Verbinski = np.genfromtxt("Verbinski.dat", usecols=(0,1))
-Chyzh = np.genfromtxt("Chyzh.dat", usecols=(0,1))
 Billnert = np.genfromtxt("Billnert.dat", usecols=(0,1))
-Oberstedt_LaCl = np.genfromtxt("StephanOberstedt_Cf252/Oberstedt2015_LaCl3.dat", usecols=(0,1,2))
-Oberstedt_LaBr = np.genfromtxt("StephanOberstedt_Cf252/Oberstedt2015_LaBr3.dat", usecols=(0,1,2))
-Oberstedt_LaBr_2 = np.genfromtxt("StephanOberstedt_Cf252/Oberstedt2015_LaBr3_2.dat", usecols=(0,1,2))
-Oberstedt_LaBr_3 = np.genfromtxt("StephanOberstedt_Cf252/Oberstedt2015_LaBr3_3.dat", usecols=(0,1,2))
+Oberstedt_LaCl = np.genfromtxt("Oberstedt_Cf252/Oberstedt2015_LaCl3.dat", usecols=(0,1,2))
+Oberstedt_LaBr = np.genfromtxt("Oberstedt_Cf252/Oberstedt2015_LaBr3.dat", usecols=(0,1,2))
+Oberstedt_LaBr_2 = np.genfromtxt("Oberstedt_Cf252/Oberstedt2015_LaBr3_2.dat", usecols=(0,1,2))
+Oberstedt_LaBr_3 = np.genfromtxt("Oberstedt_Cf252/Oberstedt2015_LaBr3_3.dat", usecols=(0,1,2))
 
 #####################################
 ###     Bin-by-bin corr factor    ###
@@ -231,8 +239,7 @@ for j in range(len(M_variable_bins)):
 #Take average of all correction factors
 average_correction = (Billnert_correction + Oberstedt_LaBr_correction + Oberstedt_LaBr_2_correction + Oberstedt_LaBr_3_correction)/float(4)
 
-np.savetxt("252Cf_correction/252Cf_PFGS_correction.dat", [np.array(edge_list[0:-1]), average_correction])
-
+#np.savetxt("252Cf_correction/252Cf_PFGS_correction.dat", [np.array(edge_list[0:-1]), average_correction])
 
 
 #Correction range
@@ -298,7 +305,6 @@ fig, ax = plt.subplots()
 ax.errorbar(bin_middle_list, M_variable_bins, yerr=M_variable_bins_unc, label="This work", color="r")
 #plt.errorbar(bin_middle_list, M_variable_bins_corrected, yerr=M_variable_bins_corrected_unc, label="This work, corrected")
 plt.plot(Verbinski[:,0]*1000, Verbinski[:,1], label="Verbinski et al. 1973", color="b")
-#plt.plot(Chyzh[:,0]*1000, Chyzh[:,1], label="Chyzh et al. 2014")
 ax.plot(Billnert[:,0]*1000, Billnert[:,1], label="Billnert et al. 2013", color="darkorange")
 #plt.errorbar(Oberstedt_LaCl[:,0]*1000, Oberstedt_LaCl[:,1], yerr=Oberstedt_LaCl[:,2], label="LaCl3:Ce (SEB 347), Oberstedt et al. 2015")
 ax.errorbar(Oberstedt_LaBr[:,0]*1000, Oberstedt_LaBr[:,1], yerr=Oberstedt_LaBr[:,2], label="Oberstedt et al. 2015", color="g")
@@ -317,7 +323,7 @@ ax.tick_params(length=4, width=1, which="minor")
 plt.legend(bbox_to_anchor = [0.65, 0.6], fontsize=13, frameon=False)
 #plt.xticks(xticks_arr, xticks_photonspectrum, fontsize=13)
 #plt.yticks(yticks_arr, fontsize=13)
-plt.show()
+#plt.show()
 
 #fig.savefig("252Cf_spec.pdf", bbox_inches='tight')
 
@@ -390,8 +396,8 @@ def energy_flat(channel, Px, Py):
 E_tot_prev_exp_weighted = np.average(np.array([6.64, 6.74, 6.76, 6.51]), weights=1.0/(np.array([0.08, 0.09, 0.09, 0.07]))**2)
 M_g_prev_exp_weighted = np.average(np.array([8.30, 8.29, 8.28, 8.28]), weights=1.0/(np.array([0.08, 0.07, 0.08, 0.07]))**2)
 
-print("E_tot_prev_exp_weighted: %.4f" % E_tot_prev_exp_weighted)
-print("M_g_prev_exp_weighted: %.4f" % M_g_prev_exp_weighted)
+#print("E_tot_prev_exp_weighted: %.4f" % E_tot_prev_exp_weighted)
+#print("M_g_prev_exp_weighted: %.4f" % M_g_prev_exp_weighted)
 
 
 
