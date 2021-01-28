@@ -23,9 +23,8 @@ F = float(133132/test_scale_factor) #252Cf
 F_unc = np.sqrt(F) #Uncertainty in nr of fissions
 
 #Only filling matrix in MAMA, unfolding in OMpy
-#M, C, y, x = read_mama_2D("11jun2020_252Cf_final/Files_used_in_article/252Cf_energy_labr_fission_mama_fnrn_ompy_unf_11jun2020.m")
-M, C, y, x = read_mama_2D("11jun2020_252Cf_final/252Cf_energy_labr_fission_mama_fnrn_ompy_unf_ownresponse.m")
-M_unc, C_unc, y_unc, x_unc = read_mama_2D("11jun2020_252Cf_final/Files_used_in_article/252Cf_energy_labr_fission_mama_fnrn_ompy_unf_std_11jun2020.m")
+M, C, y, x = read_mama_2D("28jan2021/252Cf_energy_labr_fission_all_unf_28jan2021.m")
+M_unc, C_unc, y_unc, x_unc = read_mama_2D("28jan2021/252Cf_energy_labr_fission_mama_fnrn_ompy_unf_std_11jun2020.m")
 
 #Modifying because OMpy gives it two excitaton energy bins
 M = M[0]
